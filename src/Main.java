@@ -10,6 +10,19 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/*
+شرح: أولا البرنامح سيقراء الملف المعطى المتغير text
+ بعد ذلك سيقوم بمسح السطور ليجعل النص كله سطر واحد
+ بعد ذلك سيقوم بنظيف الكود من التعليقات لكن قبل مسحها سيقوم بحفظها في متعير comments يوجد شرح مفصل عند كل داله
+ بعد تنظيف و حفظ التعليقات سيقوم بقراءه الكلاسات و الدوال و حفظ اماكنهم
+ بعد ذلك سيقزم بحفظ اماكن التعليقات في الكود لنستطيع ربط كل تعليق مع الداله الخاصه به
+حفظ الاماكن يكون عنطريق حفظ البدايه والنهايه لكل من التعليقات او كلاسات او الدوال
+بعد حفظ الاماكن نربط كل تعليق بدالته و كل داله بكلاسها
+
+
+ */
+
+
 public class Main {
     public static void main(String[] args) throws IOException {
         String text = new String(Files.readAllBytes(Paths.get(args[0])), StandardCharsets.UTF_8);
@@ -162,14 +175,23 @@ public class Main {
     }
 
     static String removeNewLines(String text) {
+        //مسح السطور و تبديل حرف السطر الجديد ب !~!
         return text.replaceAll("\\n", "!~!");
     }
 
     static String restoreNewLines(String text) {
+        // استرجاع السطور عنطري تبديل !~! الى \n
         return text.replaceAll("!~!", "\n");
     }
 
     static String emptyJavadoc(String text, ArrayList<String> comments) {
+//        محو جميع الحروف داخل الجافا دوك و وضع بدل الحروف رقم التعليق في متغير comments
+//        يعني من
+//        /**
+//          Java Doc
+//        */
+//        الى
+//        /**.1.*/
         StringBuilder builder = new StringBuilder(text);
         Pattern pattern = Pattern.compile("/\\*\\*.*?\\*/");
         Matcher matcher = pattern.matcher(text);
@@ -186,6 +208,13 @@ public class Main {
     }
 
     static String emptyMultiLineComments(String text, ArrayList<String> comments) {
+//        محو جميع الحروف داخل التعليق و وضع بدل الحروف رقم التعليق في متغير comments
+//        يعني من
+//        /*
+//          cok satirli yorum
+//        */
+//        الى
+//        /*.5.*/
         StringBuilder builder = new StringBuilder(text);
         Pattern pattern = Pattern.compile("/\\*[^\\*].*?\\*/");
         Matcher matcher = pattern.matcher(text);
@@ -246,6 +275,10 @@ public class Main {
     }
 
     private static boolean isNotMethod(String group) {
+        /*
+        الريجيكس المستخدمه للبحث عن الدوال لا تستطيع لبتفريق بين الداله او الاوامر التي تحت لهذا
+        يجب ان نتاكد من انها داله وليست احد الاوامر المذكوره تحت
+        */
         group = group.trim();
         return group.startsWith("for") || group.startsWith("if") ||
                 group.startsWith("while") || group.startsWith("catch") ||
