@@ -1,2 +1,5 @@
 .idea/
 *.iml
+
+out/production/odev1
+regexes.txt
